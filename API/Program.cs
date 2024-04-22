@@ -31,4 +31,17 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
+var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+try
+{
+    context.Database.Migrate();
+    DbSeeder.UpSeed(context);
+}
+catch (Exception e)
+{
+    logger.LogError(e, "A problem has occurred during migration");
+}
+
 app.Run();
