@@ -2,6 +2,9 @@ import { useParams } from 'react-router-dom';
 import { Product } from '../../app/models/product';
 import { useState, useEffect } from 'react';
 import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from '@mui/material';
+import agent from '../../app/api/agent';
+import NotFound from '../../app/errors/NotFound';
+import Loading from '../../app/layout/Loading';
 
 function ProductDetails() {
     const params = useParams<{ id: string }>();
@@ -12,21 +15,16 @@ function ProductDetails() {
 
     useEffect(() => {
         (async () => {
-            try {
-                const res = await fetch("http://localhost:5000/api/products/" + id);
-                const product = await res.json();
+            if (id) {
+                const product = await agent.Catalogue.getById(parseInt(id));
                 setProduct(product);
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
             }
+            setLoading(false);
         })();
     }, [id])
 
-    if (loading) return <Typography variant="h4">loading...</Typography>
-
-    if (!product) return <Typography variant="h4">Product Not Found</Typography>
+    if (loading) return <Loading />
+    if (!product) return <NotFound />
 
     return (
         <>

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using API.Data;
 using API.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductsController : BaseApiController
     {
 
         private readonly StoreContext _context;
@@ -32,6 +26,9 @@ namespace API.Controllers
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
             Product product = await _context.Products.FindAsync(id);
+
+            if (product == null) return NotFound();
+
             return product;
         }
     }
