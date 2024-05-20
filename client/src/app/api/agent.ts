@@ -12,7 +12,7 @@ const sleep = () => new Promise(resolve => setTimeout(resolve, 250));
 async function getData(url: string) {
     try {
         // fetch URL
-        const res = await fetch(url);
+        const res = await fetch(url, { credentials: "include" });
 
         // have to manually throw error if response if not OK...
         // that's just how fetch API works
@@ -31,6 +31,7 @@ async function postData(url: string, data: object) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
+            credentials: "include"  // for cookies
         });
         if (!res.ok) throw res;
 
@@ -47,6 +48,7 @@ async function putData(url: string, data: object) {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
+            credentials: "include"
         });
         if (!res.ok) throw res;
 
@@ -60,7 +62,8 @@ async function putData(url: string, data: object) {
 async function deleteData(url: string) {
     try {
         const res = await fetch(url, {
-            method: "DELETE"
+            method: "DELETE",
+            credentials: "include"
         });
         if (!res.ok) throw res;
 
@@ -155,10 +158,16 @@ const TestErrors = {
     },
 }
 
+const Cart = {
+    get: () => requests.get('cart'),
+    addItem: (productId: number, qty = 1) => requests.post(`cart?productId=${productId}&qty=${qty}`, {}),
+}
+
 // export
 const agent = {
     Catalogue,
-    TestErrors
+    TestErrors,
+    Cart
 }
 
 export default agent;

@@ -1,6 +1,6 @@
 import { ShoppingCart } from "@mui/icons-material"
 import { AppBar, Badge, Box, IconButton, List, ListItem, Switch, Toolbar, Typography } from "@mui/material"
-import { NavLink } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 
 const midLinks = [
     {
@@ -81,6 +81,8 @@ function Header({ dark, setDark }: Props) {
 
                 <Box sx={{ display: "flex", alignItems: "center" }}>
                     <IconButton
+                        component={Link}
+                        to='/cart'
                         size="large"
                         edge="start"
                         color="inherit"

@@ -42,7 +42,7 @@ namespace API.Controllers
 
             // save changes to database
             int result = await _context.SaveChangesAsync();
-            if (result > 0) return CreatedAtRoute("GetBasket", _MapCartToDto(cart));
+            if (result > 0) return CreatedAtRoute("GetCart", _MapCartToDto(cart));
             return BadRequest(new ProblemDetails { Title = "Problem saving item to basket" });
         }
 
@@ -58,6 +58,8 @@ namespace API.Controllers
             if (result > 0) return Ok();
             return BadRequest(new ProblemDetails { Title = "Problem deleting item from basket" });
         }
+
+        // ------------------------------------------------------------------------------
 
         private async Task<Product> _RetrieveProduct(int productId)
         {
