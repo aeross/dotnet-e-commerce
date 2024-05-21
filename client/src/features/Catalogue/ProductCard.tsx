@@ -4,18 +4,26 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import agent from "../../app/api/agent";
 import { LoadingButton } from "@mui/lab";
+import { UseStoreContext } from "../../app/context/StoreContext";
 
 interface Props {
     product: Product
 }
 
 export default function ProductCard({ product }: Props) {
+    const { setCart } = UseStoreContext();
     const [loading, setLoading] = useState(false);
 
     async function handleAddItem(productId: number) {
         setLoading(true);
-        await agent.Cart.addItem(productId);
-        setLoading(false);
+        try {
+            const cart = await agent.Cart.addItem(productId);
+            setCart(cart);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (

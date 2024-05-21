@@ -103,7 +103,7 @@ namespace API.Controllers
                     PictureUrl = item.Product.PictureUrl,
                     Type = item.Product.Type,
                     Brand = item.Product.Brand,
-                    Quanity = item.Qty
+                    Quantity = item.Qty
                 }).ToList()
             };
         }

@@ -28,15 +28,17 @@ export function StoreProvider({ children }: PropsWithChildren<unknown>) {
 
         const items = [...cart.items];
         const itemIndex = items.findIndex(i => i.productId === productId);
-        if (itemIndex > 0) {
-            items[itemIndex].quanity -= qty;
-            if (items[itemIndex].quanity <= 0) {
+
+        if (itemIndex >= 0) {
+            items[itemIndex].quantity -= qty;
+            if (items[itemIndex].quantity <= 0) {
                 items.splice(itemIndex, 1);
             }
             setCart(prevState => {
                 return { ...prevState!, items }
             });
         }
+
     }
     return (
         <StoreContext.Provider value={{ cart, setCart, removeItem }}>

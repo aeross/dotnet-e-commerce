@@ -11,5 +11,5 @@ export interface CartItem {
     pictureUrl: string
     brand: string
     type: string
-    quanity: number
+    quantity: number
 }

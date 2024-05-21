@@ -16,8 +16,14 @@ function ProductDetails() {
     useEffect(() => {
         (async () => {
             if (id) {
-                const product = await agent.Catalogue.getById(parseInt(id));
-                setProduct(product);
+                try {
+                    const product = await agent.Catalogue.getById(parseInt(id));
+                    setProduct(product);
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    setLoading(false);
+                }
             }
             setLoading(false);
         })();

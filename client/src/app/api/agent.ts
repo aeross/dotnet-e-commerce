@@ -7,6 +7,14 @@ const baseURL = "http://localhost:5000/" + "api/";
 // add a fake delay to our app
 const sleep = () => new Promise(resolve => setTimeout(resolve, 250));
 
+const checkIfResponseIsJson = (response: Response) => {
+    const contentType = response.headers.get('content-type');
+    if (!contentType || contentType.indexOf('application/json') === -1) {
+        return null;
+    } else {
+        return response.json();
+    }
+}
 
 // boilerplate requests
 async function getData(url: string) {
@@ -19,7 +27,7 @@ async function getData(url: string) {
         if (!res.ok) throw res;
 
         await sleep();
-        return res.json();
+        return checkIfResponseIsJson(res);
     } catch (error) {
         await handleError(error);
     }
@@ -36,7 +44,7 @@ async function postData(url: string, data: object) {
         if (!res.ok) throw res;
 
         await sleep();
-        return res.json();
+        return checkIfResponseIsJson(res);
     } catch (error) {
         handleError(error);
     }
@@ -53,7 +61,7 @@ async function putData(url: string, data: object) {
         if (!res.ok) throw res;
 
         await sleep();
-        return res.json();
+        return checkIfResponseIsJson(res);
     } catch (error) {
         handleError(error);
     }
@@ -68,7 +76,7 @@ async function deleteData(url: string) {
         if (!res.ok) throw res;
 
         await sleep();
-        return res.json();
+        return checkIfResponseIsJson(res);
     } catch (error) {
         handleError(error);
     }
@@ -161,6 +169,7 @@ const TestErrors = {
 const Cart = {
     get: () => requests.get('cart'),
     addItem: (productId: number, qty = 1) => requests.post(`cart?productId=${productId}&qty=${qty}`, {}),
+    removeItem: (productId: number, qty = 1) => requests.delete(`cart?productId=${productId}&qty=${qty}`),
 }
 
 // export
