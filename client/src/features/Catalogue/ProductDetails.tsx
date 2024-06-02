@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { Product } from '../../app/models/product';
-import { useState, useEffect, FormEvent } from 'react';
+import { useState, useEffect } from 'react';
 import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from '@mui/material';
 import agent from '../../app/api/agent';
 import NotFound from '../../app/errors/NotFound';
