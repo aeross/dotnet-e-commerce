@@ -1,19 +1,19 @@
 import { Box, Button, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Add, Delete, Remove } from "@mui/icons-material";
-import { useState } from "react";
-import agent from "../../app/api/agent";
 import { LoadingButton } from "@mui/lab";
 import CartSummary from "./CartSummary";
 import { toDollarFormat } from "../../app/utils/money";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
-import { addCartItemAsync, removeCartItemAsync, setCart } from "./cartSlice";
+import { addCartItemAsync, removeCartItemAsync } from "./cartSlice";
 
 function CartPage() {
     const dispatch = useAppDispatch();
     const { cart, status } = useAppSelector(state => state.cart);
 
-    if (!cart) return <Typography variant="h3">Your cart is empty</Typography>
+    console.log(cart);
+
+    if (!cart || cart.items.length === 0) return <Typography variant="h3">Your cart is empty</Typography>
 
     return (
         <>
@@ -43,7 +43,7 @@ function CartPage() {
                                 <TableCell align="right">{toDollarFormat(item.price / 100)}</TableCell>
                                 <TableCell align="center">
                                     <LoadingButton
-                                        loading={status.includes("pendingRemoveItem" + item.productId)}
+                                        loading={status.includes("pendingRemove" + item.productId + "Item")}
                                         onClick={() => dispatch(removeCartItemAsync({ productId: item.productId }))}
                                         color="error"
                                     >
@@ -51,7 +51,7 @@ function CartPage() {
                                     </LoadingButton>
                                     {item.quantity}
                                     <LoadingButton
-                                        loading={status.includes("pendingAddItem" + item.productId)}
+                                        loading={status.includes("pendingAdd" + item.productId + "Item")}
                                         onClick={() => dispatch(addCartItemAsync({ productId: item.productId }))}
                                         color="secondary"
                                     >
@@ -61,7 +61,7 @@ function CartPage() {
                                 <TableCell align="right">${(item.price * item.quantity / 100).toFixed(2)}</TableCell>
                                 <TableCell align="right">
                                     <LoadingButton
-                                        loading={status.includes("pendingRemoveItem" + item.productId)}
+                                        loading={status.includes("pendingRemove" + item.productId + "Item")}
                                         onClick={() => dispatch(removeCartItemAsync({ productId: item.productId, qty: item.quantity }))}
                                         color="error"
                                     >

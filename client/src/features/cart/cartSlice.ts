@@ -48,7 +48,7 @@ export const cartSlice = createSlice({
     extraReducers: (builder) => {
         // when fetching is on progress...
         builder.addCase(addCartItemAsync.pending, (state, action) => {
-            state.status = "pendingAddItem" + action.meta.arg.productId;
+            state.status = "pendingAdd" + action.meta.arg.productId + "Item";
         });
 
         // when the request returns 200
@@ -63,18 +63,19 @@ export const cartSlice = createSlice({
         });
 
         builder.addCase(removeCartItemAsync.pending, (state, action) => {
-            state.status = "pendingRemoveItem" + action.meta.arg.productId;
+            state.status = "pendingRemove" + action.meta.arg.productId + "Item";
         });
         builder.addCase(removeCartItemAsync.fulfilled, (state, action) => {
-            // the API forx remove item does not return the new cart with the item removed.
+            // the API to remove item does not return the new cart with the item removed.
             // that's why we need to do this... (remove the item from the cart state itself)
             if (!state.cart) return;
 
-            const { productId, qty } = action.meta.arg;
+            const { productId, qty = 1 } = action.meta.arg;
+
             const itemIndex = state.cart.items.findIndex(i => i.productId === productId);
 
             if (itemIndex >= 0) {
-                state.cart.items[itemIndex].quantity -= qty!;
+                state.cart.items[itemIndex].quantity -= qty;
                 if (state.cart.items[itemIndex].quantity <= 0) {
                     state.cart.items.splice(itemIndex, 1);
                 }

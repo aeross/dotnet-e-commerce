@@ -123,7 +123,7 @@ function ProductDetails() {
                         <Grid item xs={6}>
                             <LoadingButton
                                 disabled={quantity === item?.quantity || (!item && quantity === 0)}
-                                loading={status.includes("pending" + item?.productId)}
+                                loading={status.includes("pending")}
                                 onClick={submitQtyChange}
                                 sx={{ height: '55px' }}
                                 color='primary'
