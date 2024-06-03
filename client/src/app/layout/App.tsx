@@ -4,15 +4,16 @@ import { Container, createTheme, CssBaseline, ThemeProvider } from '@mui/materia
 import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/ReactToastify.css";
-import { UseStoreContext } from '../context/StoreContext';
 import { getCookie } from '../utils/cookie';
 import agent from '../api/agent';
 import Loading from './Loading';
+import { useDispatch } from 'react-redux';
+import { setCart } from '../../features/cart/cartSlice';
 
 function App() {
   const [dark, setDark] = useState(false);
 
-  const { setCart } = UseStoreContext();
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +23,7 @@ function App() {
       (async () => {
         try {
           const cart = await agent.Cart.get();
-          setCart(cart);
+          dispatch(setCart(cart));
         } catch (error) {
           console.log(error);
         } finally {
@@ -32,7 +33,7 @@ function App() {
     } else {
       setLoading(false);
     }
-  }, [setCart])
+  }, [dispatch])
 
   const theme = createTheme({
     palette: {

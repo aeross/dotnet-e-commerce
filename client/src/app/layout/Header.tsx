@@ -1,7 +1,7 @@
 import { ShoppingCart } from "@mui/icons-material"
 import { AppBar, Badge, Box, IconButton, List, ListItem, Switch, Toolbar, Typography } from "@mui/material"
 import { Link, NavLink } from "react-router-dom"
-import { UseStoreContext } from "../context/StoreContext"
+import { useAppSelector } from "../store/configureStore"
 
 const midLinks = [
     {
@@ -48,7 +48,7 @@ interface Props {
 }
 
 function Header({ dark, setDark }: Props) {
-    const { cart } = UseStoreContext();
+    const { cart } = useAppSelector(state => state.cart);
 
     return (
         <AppBar position="static" sx={{ mb: 4 }}>

@@ -6,11 +6,13 @@ import agent from '../../app/api/agent';
 import NotFound from '../../app/errors/NotFound';
 import Loading from '../../app/layout/Loading';
 import { toDollarFormat } from '../../app/utils/money';
-import { UseStoreContext } from '../../app/context/StoreContext';
 import { LoadingButton } from '@mui/lab';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { addCartItemAsync, removeCartItemAsync, setCart } from '../cart/cartSlice';
 
 function ProductDetails() {
-    const { cart, setCart, removeItem } = UseStoreContext();
+    const dispatch = useAppDispatch();
+    const { cart, status } = useAppSelector(store => store.cart);
 
     const params = useParams<{ id: string }>();
     const id = params.id;
@@ -18,7 +20,6 @@ function ProductDetails() {
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [quantity, setQuantity] = useState(0);
-    const [loadingQty, setLoadingQty] = useState(false);
     const item = cart?.items.find(i => i.productId == product?.id);
 
     useEffect(() => {
@@ -48,29 +49,22 @@ function ProductDetails() {
 
     async function submitQtyChange() {
         if (!product) return;
-        setLoadingQty(true);
 
         try {
-            let cart;
             if (!item) {
                 // add item to cart, when there is no item in the cart yet
-                cart = await agent.Cart.addItem(product.id, quantity);
-                setCart(cart);
+                dispatch(addCartItemAsync({ productId: product?.id!, qty: quantity }));
             } else if (quantity > item.quantity) {
                 // add item to cart, when the specified quantity is larger than the item's quantity in cart
                 const updatedQty = quantity - item.quantity;
-                cart = await agent.Cart.addItem(product.id, updatedQty);
-                setCart(cart);
+                dispatch(addCartItemAsync({ productId: product?.id!, qty: updatedQty }));
             } else if (quantity < item.quantity) {
                 // remove item from cart, when the specified quantity is smaller than the item's quantity in cart
                 const updatedQty = item.quantity - quantity;
-                await agent.Cart.removeItem(product.id, updatedQty);
-                removeItem(product?.id!, updatedQty);
+                dispatch(removeCartItemAsync({ productId: product?.id!, qty: updatedQty }));
             }
         } catch (error) {
             console.log(error);
-        } finally {
-            setLoadingQty(false);
         }
     }
 
@@ -129,7 +123,7 @@ function ProductDetails() {
                         <Grid item xs={6}>
                             <LoadingButton
                                 disabled={quantity === item?.quantity || (!item && quantity === 0)}
-                                loading={loadingQty}
+                                loading={status.includes("pending" + item?.productId)}
                                 onClick={submitQtyChange}
                                 sx={{ height: '55px' }}
                                 color='primary'
