@@ -36,7 +36,7 @@ namespace API.Controllers
             if (cart == null) cart = _CreateCart();
 
             Product product = await _RetrieveProduct(productId);
-            if (product == null) return NotFound();
+            if (product == null) return BadRequest(new ProblemDetails { Title = "Product not found" });
 
             cart.AddItem(product, qty);
 

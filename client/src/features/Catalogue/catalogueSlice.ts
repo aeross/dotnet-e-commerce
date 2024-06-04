@@ -8,22 +8,14 @@ const productsAdapter = createEntityAdapter<Product>();
 export const fetchProductsAsync = createAsyncThunk<Product[]>(
     'catalogue/fetchProductsAsync',
     async () => {
-        try {
-            return await agent.Catalogue.getAll();
-        } catch (error) {
-            console.log(error);
-        }
+        return await agent.Catalogue.getAll();
     }
 );
 
 export const fetchProductByIdAsync = createAsyncThunk<Product, number>(
     'catalogue/fetchProductByIdAsync',
     async (productId) => {
-        try {
-            return await agent.Catalogue.getById(productId);
-        } catch (error) {
-            console.log(error);
-        }
+        return await agent.Catalogue.getById(productId);
     }
 );
 
@@ -39,24 +31,18 @@ export const catalogueSlice = createSlice({
             state.status = "pendingFetchProducts";
         });
         builder.addCase(fetchProductsAsync.fulfilled, (state, action) => {
-            productsAdapter.setAll(state, action.payload);
+            if (action.payload) productsAdapter.setAll(state, action.payload);
             state.status = "idle";
             state.productsLoaded = true;
-        });
-        builder.addCase(fetchProductsAsync.rejected, (state) => {
-            state.status = "idle";
         });
 
         builder.addCase(fetchProductByIdAsync.pending, (state) => {
             state.status = "pendingFetchProductById";
         });
         builder.addCase(fetchProductByIdAsync.fulfilled, (state, action) => {
-            productsAdapter.upsertOne(state, action.payload);
+            if (action.payload) productsAdapter.upsertOne(state, action.payload);
             state.status = "idle";
         });
-        builder.addCase(fetchProductByIdAsync.rejected, (state) => {
-            state.status = "idle";
-        })
     })
 })
 

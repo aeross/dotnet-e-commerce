@@ -46,7 +46,7 @@ async function postData(url: string, data: object) {
         await sleep();
         return checkIfResponseIsJson(res);
     } catch (error) {
-        handleError(error);
+        await handleError(error);
     }
 }
 
@@ -63,7 +63,7 @@ async function putData(url: string, data: object) {
         await sleep();
         return checkIfResponseIsJson(res);
     } catch (error) {
-        handleError(error);
+        await handleError(error);
     }
 }
 
@@ -78,7 +78,7 @@ async function deleteData(url: string) {
         await sleep();
         return checkIfResponseIsJson(res);
     } catch (error) {
-        handleError(error);
+        await handleError(error);
     }
 }
 
@@ -99,7 +99,7 @@ const handleError = async (error: any) => {
                 throw modelStateErrors.flat();
             }
             toast.error(response.title);
-            break;
+            throw error;
         case 401:
             toast.error(response.title);
             break;
@@ -153,7 +153,13 @@ const Catalogue = {
 }
 
 const TestErrors = {
-    get400: () => requests.get("buggy/bad-request"),
+    get400: () => {
+        try {
+            return requests.get("buggy/bad-request")
+        } catch (error) {
+            throw error;
+        }
+    },
     get401: () => requests.get("buggy/unauthorized"),
     get404: () => requests.get("buggy/not-found"),
     get500: () => requests.get("buggy/server-error"),
@@ -169,7 +175,13 @@ const TestErrors = {
 const Cart = {
     get: () => requests.get('cart'),
     addItem: (productId: number, qty = 1) => requests.post(`cart?productId=${productId}&qty=${qty}`, {}),
-    removeItem: (productId: number, qty = 1) => requests.delete(`cart?productId=${productId}&qty=${qty}`),
+    removeItem: (productId: number, qty = 1) => {
+        try {
+            return requests.delete(`cart?productId=${productId}&qty=${qty}`)
+        } catch (error) {
+            throw error;
+        }
+    },
 }
 
 // export

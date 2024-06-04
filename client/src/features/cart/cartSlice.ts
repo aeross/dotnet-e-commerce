@@ -16,22 +16,28 @@ const initialState: cartState = {
 // centralising our API requests here
 export const addCartItemAsync = createAsyncThunk<Cart, { productId: number, qty?: number }>(
     "cart/addItemAsync",
-    async ({ productId, qty = 1 }) => {
+    async ({ productId, qty = 1 }, thunkAPI) => {
         try {
             return await agent.Cart.addItem(productId, qty);
-        } catch (error) {
-            console.log(error);
+        } catch (error: unknown) {
+            if (error instanceof Response) {
+                return thunkAPI.rejectWithValue({ error: error.status + " " + error.statusText });
+            }
+            return thunkAPI.rejectWithValue({ error: "An error has occured" });
         }
     }
 );
 
 export const removeCartItemAsync = createAsyncThunk<void, { productId: number, qty?: number, name?: string }>(
     "cart/removeItemAsync",
-    async ({ productId, qty = 1 }) => {
+    async ({ productId, qty = 1 }, thunkAPI) => {
         try {
             await agent.Cart.removeItem(productId, qty);
-        } catch (error) {
-            console.log(error);
+        } catch (error: unknown) {
+            if (error instanceof Response) {
+                return thunkAPI.rejectWithValue({ error: error.status + " " + error.statusText });
+            }
+            return thunkAPI.rejectWithValue({ error: "An error has occured" });
         }
     }
 );
@@ -51,14 +57,15 @@ export const cartSlice = createSlice({
             state.status = "pendingAdd" + action.meta.arg.productId + "Item";
         });
 
-        // when the request returns 200
+        // when the request returns ok
         builder.addCase(addCartItemAsync.fulfilled, (state, action) => {
-            state.cart = action.payload;
+            if (action.payload) state.cart = action.payload;
             state.status = "idle";
         });
 
         // when the request returns an error
-        builder.addCase(addCartItemAsync.rejected, (state) => {
+        builder.addCase(addCartItemAsync.rejected, (state, action) => {
+            console.log(action.payload);
             state.status = "idle";
         });
 
@@ -84,7 +91,8 @@ export const cartSlice = createSlice({
 
             state.status = "idle";
         });
-        builder.addCase(removeCartItemAsync.rejected, (state) => {
+        builder.addCase(removeCartItemAsync.rejected, (state, action) => {
+            console.log(action.payload);
             state.status = "idle";
         });
     }
