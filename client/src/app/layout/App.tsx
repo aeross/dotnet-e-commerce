@@ -7,13 +7,13 @@ import "react-toastify/ReactToastify.css";
 import { getCookie } from '../utils/cookie';
 import agent from '../api/agent';
 import Loading from './Loading';
-import { useDispatch } from 'react-redux';
 import { setCart } from '../../features/cart/cartSlice';
+import { useAppDispatch } from '../store/configureStore';
 
 function App() {
   const [dark, setDark] = useState(false);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

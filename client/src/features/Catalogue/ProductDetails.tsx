@@ -1,44 +1,30 @@
 import { useParams } from 'react-router-dom';
-import { Product } from '../../app/models/product';
 import { useState, useEffect } from 'react';
 import { Divider, Grid, Table, TableBody, TableCell, TableContainer, TableRow, TextField, Typography } from '@mui/material';
-import agent from '../../app/api/agent';
 import NotFound from '../../app/errors/NotFound';
 import Loading from '../../app/layout/Loading';
 import { toDollarFormat } from '../../app/utils/money';
 import { LoadingButton } from '@mui/lab';
 import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
-import { addCartItemAsync, removeCartItemAsync, setCart } from '../cart/cartSlice';
+import { addCartItemAsync, removeCartItemAsync } from '../cart/cartSlice';
+import { fetchProductByIdAsync, productSelectors } from './catalogueSlice';
 
 function ProductDetails() {
     const dispatch = useAppDispatch();
-    const { cart, status } = useAppSelector(store => store.cart);
+    const { cart, status } = useAppSelector(state => state.cart);
+    const { status: productStatus } = useAppSelector(state => state.catalogue);
 
     const params = useParams<{ id: string }>();
-    const id = params.id;
+    const id = params.id ?? "";
 
-    const [product, setProduct] = useState<Product | null>(null);
-    const [loading, setLoading] = useState(true);
+    const product = useAppSelector(state => productSelectors.selectById(state, parseInt(id)));
     const [quantity, setQuantity] = useState(0);
     const item = cart?.items.find(i => i.productId == product?.id);
 
     useEffect(() => {
-        (async () => {
-            if (item) setQuantity(item.quantity);
-
-            if (id) {
-                try {
-                    const product = await agent.Catalogue.getById(parseInt(id));
-                    setProduct(product);
-                } catch (error) {
-                    console.log(error);
-                } finally {
-                    setLoading(false);
-                }
-            }
-            setLoading(false);
-        })();
-    }, [id, item])
+        if (item) setQuantity(item.quantity);
+        if (!product) dispatch(fetchProductByIdAsync(parseInt(id)));
+    }, [id, item, dispatch, product])
 
     function handleQtyChange(event: React.ChangeEvent<HTMLInputElement>) {
         const val = parseInt(event.target.value);
@@ -68,7 +54,7 @@ function ProductDetails() {
         }
     }
 
-    if (loading) return <Loading />
+    if (productStatus.includes("pending")) return <Loading />
     if (!product) return <NotFound />
 
     return (
