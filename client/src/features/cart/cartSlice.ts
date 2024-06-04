@@ -25,7 +25,7 @@ export const addCartItemAsync = createAsyncThunk<Cart, { productId: number, qty?
     }
 );
 
-export const removeCartItemAsync = createAsyncThunk<void, { productId: number, qty?: number }>(
+export const removeCartItemAsync = createAsyncThunk<void, { productId: number, qty?: number, name?: string }>(
     "cart/removeItemAsync",
     async ({ productId, qty = 1 }) => {
         try {
@@ -63,7 +63,8 @@ export const cartSlice = createSlice({
         });
 
         builder.addCase(removeCartItemAsync.pending, (state, action) => {
-            state.status = "pendingRemove" + action.meta.arg.productId + "Item";
+            const name = action.meta.arg.name ?? "";
+            state.status = "pendingRemove" + action.meta.arg.productId + name + "Item";
         });
         builder.addCase(removeCartItemAsync.fulfilled, (state, action) => {
             // the API to remove item does not return the new cart with the item removed.

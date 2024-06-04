@@ -61,8 +61,8 @@ function CartPage() {
                                 <TableCell align="right">${(item.price * item.quantity / 100).toFixed(2)}</TableCell>
                                 <TableCell align="right">
                                     <LoadingButton
-                                        loading={status.includes("pendingRemove" + item.productId + "Item")}
-                                        onClick={() => dispatch(removeCartItemAsync({ productId: item.productId, qty: item.quantity }))}
+                                        loading={status.includes("pendingRemove" + item.productId + "delItem")}
+                                        onClick={() => dispatch(removeCartItemAsync({ productId: item.productId, qty: item.quantity, name: "del" }))}
                                         color="error"
                                     >
                                         <Delete />
