@@ -7,6 +7,7 @@ import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Gri
 import ProductSearch from './ProductSearch';
 import { ProductSortOptions } from '../../app/models/product';
 import RadioButtonGroup from '../../app/components/RadioButtonGroup';
+import CheckboxButtonGroup from '../../app/components/CheckboxButtonGroup';
 
 const sortOptions: ProductSortOptions[] = [
     { value: "name", label: "Alphabetical" },
@@ -36,6 +37,7 @@ export default function Catalogue() {
                 </Paper>
 
                 <Paper sx={{ mb: 2, p: 2 }}>
+                    <FormLabel>Sort by</FormLabel>
                     <RadioButtonGroup
                         selectedValue={productParams.orderBy}
                         options={sortOptions}
@@ -45,20 +47,20 @@ export default function Catalogue() {
 
                 <Paper sx={{ mb: 2, p: 2 }}>
                     <FormLabel>Filter by brand</FormLabel>
-                    <FormGroup>
-                        {brands.map((brand, i) => (
-                            <FormControlLabel control={<Checkbox />} label={brand} key={i} />
-                        ))}
-                    </FormGroup>
+                    <CheckboxButtonGroup
+                        items={brands}
+                        checked={productParams.brands}
+                        onChange={(items: string[]) => dispatch(setProductParams({ brands: items }))}
+                    />
                 </Paper>
 
                 <Paper sx={{ mb: 2, p: 2 }}>
                     <FormLabel>Filter by type</FormLabel>
-                    <FormGroup>
-                        {types.map((type, i) => (
-                            <FormControlLabel control={<Checkbox />} label={type} key={i} />
-                        ))}
-                    </FormGroup>
+                    <CheckboxButtonGroup
+                        items={types}
+                        checked={productParams.types}
+                        onChange={(items: string[]) => dispatch(setProductParams({ types: items }))}
+                    />
                 </Paper>
             </Grid>
 

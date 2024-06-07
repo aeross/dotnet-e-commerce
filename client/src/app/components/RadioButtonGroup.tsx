@@ -10,7 +10,6 @@ interface Props {
 function RadioButtonGroup({ options, onChange, selectedValue }: Props) {
     return (
         <FormControl>
-            <FormLabel>Sort by</FormLabel>
             <RadioGroup onChange={onChange} value={selectedValue}>
                 {options.map(({ value, label }, i) => (
                     <FormControlLabel value={value} control={<Radio />} label={label} key={i} />
