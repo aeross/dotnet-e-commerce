@@ -12,9 +12,9 @@ const getParams = (productParams: ProductParams) => {
     params.append("pageSize", productParams.pageSize.toString());
     params.append("orderBy", productParams.orderBy);
 
-    if (productParams.searchTerm) params.append("", productParams.searchTerm);
-    if (productParams.brands) params.append("", productParams.brands.toString());
-    if (productParams.types) params.append("", productParams.types.toString());
+    if (productParams.searchTerm) params.append("searchTerm", productParams.searchTerm);
+    if (productParams.brands) params.append("brands", productParams.brands.toString());
+    if (productParams.types) params.append("types", productParams.types.toString());
 
     return params;
 }
@@ -67,6 +67,7 @@ export const catalogueSlice = createSlice({
         setProductParams: (state, action) => {
             state.productsLoaded = false;
             state.productParams = { ...state.productParams, ...action.payload };
+
         },
         resetProductParams: (state) => {
             state.productParams = initParams();
