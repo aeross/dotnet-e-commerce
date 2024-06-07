@@ -1,5 +1,5 @@
 import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import { Product } from "../../app/models/product";
+import { Product, ProductParams } from "../../app/models/product";
 import agent from "../../app/api/agent";
 import { RootState } from "../../app/store/configureStore";
 
@@ -19,13 +19,44 @@ export const fetchProductByIdAsync = createAsyncThunk<Product, number>(
     }
 );
 
+export const fetchFilters = createAsyncThunk(
+    'catalogue/fetchFilters',
+    async () => {
+        return await agent.Catalogue.getFilters();
+    }
+);
+
+// the slice
+export interface CatalogueState {
+    productsLoaded: boolean;
+    filtersLoaded: boolean;
+    brands: string[];
+    types: string[];
+    status: string;
+    productParams: ProductParams;
+}
+
+const initParams = () => ({ orderBy: "name", pageNumber: 1, pageSize: 6 });
+
 export const catalogueSlice = createSlice({
     name: "catalogue",
-    initialState: productsAdapter.getInitialState({
+    initialState: productsAdapter.getInitialState<CatalogueState>({
         productsLoaded: false,
-        status: "idle"
+        filtersLoaded: false,
+        brands: [],
+        types: [],
+        status: "idle",
+        productParams: initParams()
     }),
-    reducers: {},
+    reducers: {
+        setProductParams: (state, action) => {
+            state.productsLoaded = false;
+            state.productParams = { ...state.productParams, ...action.payload };
+        },
+        resetProductParams: (state) => {
+            state.productParams = initParams();
+        }
+    },
     extraReducers: (builder => {
         builder.addCase(fetchProductsAsync.pending, (state) => {
             state.status = "pendingFetchProducts";
@@ -43,7 +74,18 @@ export const catalogueSlice = createSlice({
             if (action.payload) productsAdapter.upsertOne(state, action.payload);
             state.status = "idle";
         });
+
+        builder.addCase(fetchFilters.pending, (state) => {
+            state.status = "pendingFetchFilters";
+        });
+        builder.addCase(fetchFilters.fulfilled, (state, action) => {
+            state.brands = action.payload.brands;
+            state.types = action.payload.types;
+            state.filtersLoaded = true;
+            state.status = "idle";
+        });
     })
 })
 
 export const productSelectors = productsAdapter.getSelectors((state: RootState) => state.catalogue);
+export const { setProductParams, resetProductParams } = catalogueSlice.actions;

@@ -12,7 +12,7 @@ export default function ProductList({ products }: Props) {
             {
                 products.map(p => {
                     return (
-                        <Grid item xs={3} key={p.id}>
+                        <Grid item xs={4} key={p.id}>
                             <ProductCard product={p} />
                         </Grid>
                     )

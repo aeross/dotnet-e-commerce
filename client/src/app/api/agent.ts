@@ -150,6 +150,7 @@ const requests = {
 const Catalogue = {
     getAll: () => requests.get("products"),
     getById: (id: number) => requests.get("products/" + id),
+    getFilters: () => requests.get("products/filters")
 }
 
 const TestErrors = {
