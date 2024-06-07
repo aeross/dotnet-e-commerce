@@ -32,6 +32,8 @@ namespace API.Controllers
             // pagination
             var products = await PagedList<Product>.ToPagedList(query, productParams.PageNumber, productParams.PageSize);
 
+            Response.AddPaginationHeader(products.MetaData);
+
             return products;
         }
 
@@ -43,6 +45,15 @@ namespace API.Controllers
             if (product == null) return NotFound();
 
             return product;
+        }
+
+        [HttpGet("filters")]
+        public async Task<IActionResult> GetFilters()
+        {
+            var brands = await _context.Products.Select(p => p.Brand).Distinct().ToListAsync();
+            var types = await _context.Products.Select(p => p.Type).Distinct().ToListAsync();
+
+            return Ok(new { brands, types });
         }
     }
 }
