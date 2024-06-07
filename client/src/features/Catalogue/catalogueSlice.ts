@@ -5,10 +5,25 @@ import { RootState } from "../../app/store/configureStore";
 
 const productsAdapter = createEntityAdapter<Product>();
 
-export const fetchProductsAsync = createAsyncThunk<Product[]>(
+const getParams = (productParams: ProductParams) => {
+    const params = new URLSearchParams();
+
+    params.append("pageNumber", productParams.pageNumber.toString());
+    params.append("pageSize", productParams.pageSize.toString());
+    params.append("orderBy", productParams.orderBy);
+
+    if (productParams.searchTerm) params.append("", productParams.searchTerm);
+    if (productParams.brands) params.append("", productParams.brands.toString());
+    if (productParams.types) params.append("", productParams.types.toString());
+
+    return params;
+}
+
+export const fetchProductsAsync = createAsyncThunk<Product[], void, { state: RootState }>(
     'catalogue/fetchProductsAsync',
-    async () => {
-        return await agent.Catalogue.getAll();
+    async (_, thunkAPI) => {
+        const params = getParams(thunkAPI.getState().catalogue.productParams);
+        return await agent.Catalogue.getAll(params);
     }
 );
 

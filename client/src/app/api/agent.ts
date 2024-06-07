@@ -116,9 +116,9 @@ const handleError = async (error: any) => {
 
 // centralisation of all API requests
 const requests = {
-    get: async (url: string) => {
+    get: async (url: string, params?: URLSearchParams) => {
         try {
-            return await getData(baseURL + url)
+            return await getData(baseURL + url + (params == null ? "" : `?${params}`))
         } catch (error) {
             throw error;
         }
@@ -148,7 +148,7 @@ const requests = {
 
 // specific requests
 const Catalogue = {
-    getAll: () => requests.get("products"),
+    getAll: (params: URLSearchParams) => requests.get("products", params),
     getById: (id: number) => requests.get("products/" + id),
     getFilters: () => requests.get("products/filters")
 }
