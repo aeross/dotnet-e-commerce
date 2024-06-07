@@ -17,3 +17,8 @@ export interface ProductParams {
     pageNumber: number;
     pageSize: number;
 }
+
+export interface ProductSortOptions {
+    value: string;
+    label: string;
+}
