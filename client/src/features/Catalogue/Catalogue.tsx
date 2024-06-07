@@ -3,7 +3,7 @@ import ProductList from "../catalogue/ProductList"
 import Loading from "../../app/layout/Loading";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
 import { fetchFilters, fetchProductsAsync, productSelectors, setProductParams } from "./catalogueSlice";
-import { Box, Checkbox, FormControl, FormControlLabel, FormGroup, FormLabel, Grid, Pagination, Paper, Radio, RadioGroup, Typography } from '@mui/material';
+import { Box, FormLabel, Grid, Pagination, Paper, Typography } from '@mui/material';
 import ProductSearch from './ProductSearch';
 import { ProductSortOptions } from '../../app/models/product';
 import RadioButtonGroup from '../../app/components/RadioButtonGroup';

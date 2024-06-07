@@ -1,17 +1,27 @@
 import { toast } from "react-toastify";
 import { ErrorResponse } from "../models/response";
 import { router } from "../router/Routes";
+import { PaginatedResponse } from "../models/pagination";
 
 const baseURL = "http://localhost:5000/" + "api/";
 
 // add a fake delay to our app
 const sleep = () => new Promise(resolve => setTimeout(resolve, 250));
 
-const checkIfResponseIsJson = (response: Response) => {
+const getResponseJson = async (response: Response) => {
     const contentType = response.headers.get('content-type');
     if (!contentType || contentType.indexOf('application/json') === -1) {
         return null;
     } else {
+
+
+        // handle a special case to handle pagination passed via the header
+        const pagination = response.headers.get("pagination");
+        if (pagination) {
+            const responseJson = await response.json();
+            return new PaginatedResponse(responseJson, JSON.parse(pagination));
+        }
+
         return response.json();
     }
 }
@@ -20,14 +30,14 @@ const checkIfResponseIsJson = (response: Response) => {
 async function getData(url: string) {
     try {
         // fetch URL
-        const res = await fetch(url, { credentials: "include" });
+        let res = await fetch(url, { credentials: "include" });
 
         // have to manually throw error if response if not OK...
         // that's just how fetch API works
         if (!res.ok) throw res;
 
         await sleep();
-        return checkIfResponseIsJson(res);
+        return getResponseJson(res);
     } catch (error) {
         await handleError(error);
     }
@@ -44,7 +54,7 @@ async function postData(url: string, data: object) {
         if (!res.ok) throw res;
 
         await sleep();
-        return checkIfResponseIsJson(res);
+        return getResponseJson(res);
     } catch (error) {
         await handleError(error);
     }
@@ -61,7 +71,7 @@ async function putData(url: string, data: object) {
         if (!res.ok) throw res;
 
         await sleep();
-        return checkIfResponseIsJson(res);
+        return getResponseJson(res);
     } catch (error) {
         await handleError(error);
     }
@@ -76,7 +86,7 @@ async function deleteData(url: string) {
         if (!res.ok) throw res;
 
         await sleep();
-        return checkIfResponseIsJson(res);
+        return getResponseJson(res);
     } catch (error) {
         await handleError(error);
     }
