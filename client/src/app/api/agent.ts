@@ -14,7 +14,6 @@ const getResponseJson = async (response: Response) => {
         return null;
     } else {
 
-
         // handle a special case to handle pagination passed via the header
         const pagination = response.headers.get("pagination");
         if (pagination) {
