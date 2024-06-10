@@ -17,6 +17,10 @@ const getParams = (productParams: ProductParams) => {
     if (productParams.brands) params.append("brands", productParams.brands.toString());
     if (productParams.types) params.append("types", productParams.types.toString());
 
+    if (!productParams.searchTerm || productParams.searchTerm.length === 0) params.delete("searchTerm");
+    if (!productParams.brands || productParams.brands.length === 0) params.delete("brands");
+    if (!productParams.types || productParams.types.length === 0) params.delete("types");
+
     return params;
 }
 
@@ -72,7 +76,6 @@ export const catalogueSlice = createSlice({
         setProductParams: (state, action) => {
             state.productsLoaded = false;
             state.productParams = { ...state.productParams, ...action.payload };
-
         },
         setMetaData: (state, action) => {
             state.metaData = action.payload;

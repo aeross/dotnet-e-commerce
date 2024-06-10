@@ -32,7 +32,7 @@ export default function Catalogue() {
 
     if (status.includes("pending")) return <Loading />
     return (
-        <Grid container spacing={4} sx={{ mb: 4 }}>
+        <Grid container columnSpacing={4} sx={{ mb: 2 }}>
             <Grid item xs={3}>
                 <Paper sx={{ mb: 2 }}>
                     <ProductSearch />
@@ -43,7 +43,8 @@ export default function Catalogue() {
                     <RadioButtonGroup
                         selectedValue={productParams.orderBy}
                         options={sortOptions}
-                        onChange={(event: any) => dispatch(setProductParams({ orderBy: event.target.value }))}
+                        // whenever the filter changes, reset pagination's current page back to 1
+                        onChange={(event: any) => dispatch(setProductParams({ orderBy: event.target.value, pageNumber: 1 }))}
                     />
                 </Paper>
 
@@ -52,7 +53,8 @@ export default function Catalogue() {
                     <CheckboxButtonGroup
                         items={brands}
                         checked={productParams.brands}
-                        onChange={(items: string[]) => dispatch(setProductParams({ brands: items }))}
+                        // whenever the filter changes, reset pagination's current page back to 1
+                        onChange={(items: string[]) => dispatch(setProductParams({ brands: items, pageNumber: 1 }))}
                     />
                 </Paper>
 
@@ -61,7 +63,8 @@ export default function Catalogue() {
                     <CheckboxButtonGroup
                         items={types}
                         checked={productParams.types}
-                        onChange={(items: string[]) => dispatch(setProductParams({ types: items }))}
+                        // whenever the filter changes, reset pagination's current page back to 1
+                        onChange={(items: string[]) => dispatch(setProductParams({ types: items, pageNumber: 1 }))}
                     />
                 </Paper>
             </Grid>

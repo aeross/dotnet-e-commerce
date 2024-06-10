@@ -9,7 +9,8 @@ function ProductSearch() {
 
     const [searchInput, setSearchInput] = useState(productParams.searchTerm);
     const debouncedSearch = debounce((event: any) => {
-        dispatch(setProductParams({ searchTerm: event.target.value }))
+        // whenever the filter changes, reset pagination's current page back to 1
+        dispatch(setProductParams({ searchTerm: event.target.value, pageNumber: 1 }))
     }, 1000)
     return (
         <TextField
