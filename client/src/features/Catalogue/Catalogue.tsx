@@ -30,7 +30,8 @@ export default function Catalogue() {
     }, [filtersLoaded, dispatch])
 
 
-    if (status.includes("pending")) return <Loading />
+    if (!filtersLoaded) return <Loading />
+
     return (
         <Grid container columnSpacing={4} sx={{ mb: 2 }}>
             <Grid item xs={3}>
