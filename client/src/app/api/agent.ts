@@ -194,11 +194,18 @@ const Cart = {
     },
 }
 
+const Account = {
+    login: (reqBody: any) => requests.post('account/login', reqBody),
+    register: (reqBody: any) => requests.post('account/register', reqBody),
+    currUser: () => requests.get('account/currentUser'),
+}
+
 // export
 const agent = {
     Catalogue,
     TestErrors,
-    Cart
+    Cart,
+    Account
 }
 
 export default agent;
