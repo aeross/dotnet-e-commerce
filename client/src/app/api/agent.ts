@@ -111,7 +111,7 @@ const handleError = async (error: any) => {
             throw error;
         case 401:
             toast.error(response.title);
-            break;
+            throw error;
         case 404:
             router.navigate("/not-found");
             break;

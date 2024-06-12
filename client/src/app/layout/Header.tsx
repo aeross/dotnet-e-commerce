@@ -2,6 +2,7 @@ import { ShoppingCart } from "@mui/icons-material"
 import { AppBar, Badge, Box, IconButton, List, ListItem, Switch, Toolbar, Typography } from "@mui/material"
 import { Link, NavLink } from "react-router-dom"
 import { useAppSelector } from "../store/configureStore"
+import SignedInMenu from "./SignedInMenu"
 
 const midLinks = [
     {
@@ -49,6 +50,7 @@ interface Props {
 
 function Header({ dark, setDark }: Props) {
     const { cart } = useAppSelector(state => state.cart);
+    const { user } = useAppSelector(state => state.account);
 
     return (
         <AppBar position="static" sx={{ mb: 4 }}>
@@ -96,22 +98,26 @@ function Header({ dark, setDark }: Props) {
                         </Badge>
                     </IconButton>
 
-                    <List sx={{ display: "flex" }}>
-                        {
-                            rightLinks.map(elem => {
-                                return (
-                                    <ListItem
-                                        component={NavLink}
-                                        to={elem.path}
-                                        key={elem.path}
-                                        sx={navStyles}
-                                    >
-                                        {elem.title.toUpperCase()}
-                                    </ListItem>
-                                )
-                            })
-                        }
-                    </List>
+                    {user ? (
+                        <SignedInMenu />
+                    ) : (
+                        <List sx={{ display: "flex" }}>
+                            {
+                                rightLinks.map(elem => {
+                                    return (
+                                        <ListItem
+                                            component={NavLink}
+                                            to={elem.path}
+                                            key={elem.path}
+                                            sx={navStyles}
+                                        >
+                                            {elem.title.toUpperCase()}
+                                        </ListItem>
+                                    )
+                                })
+                            }
+                        </List>
+                    )}
                 </Box>
             </Toolbar>
         </AppBar>
