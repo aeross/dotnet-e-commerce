@@ -3,6 +3,7 @@ import { User } from "../../app/models/user";
 import { FieldValues } from "react-hook-form";
 import agent from "../../app/api/agent";
 import { router } from "../../app/router/Routes";
+import { toast } from "react-toastify";
 
 interface AccountState {
     user: User | null;
@@ -22,6 +23,8 @@ export const loginUser = createAsyncThunk<User, FieldValues>(
         } catch (error: unknown) {
             if (error instanceof Response) {
                 return thunkAPI.rejectWithValue({ error: error.status + " " + error.statusText });
+            } else if (error instanceof Error) {
+                return thunkAPI.rejectWithValue({ error: error.message });
             }
             return thunkAPI.rejectWithValue({ error: "An error has occured" });
         }
@@ -31,6 +34,7 @@ export const loginUser = createAsyncThunk<User, FieldValues>(
 export const fetchCurrUser = createAsyncThunk<User>(
     "account/fetchCurrUser",
     async (_, thunkAPI) => {
+        thunkAPI.dispatch(setUser(JSON.parse(localStorage.getItem("user")!)));
         try {
             const user = await agent.Account.currUser();
             localStorage.setItem("user", JSON.stringify(user));
@@ -38,10 +42,16 @@ export const fetchCurrUser = createAsyncThunk<User>(
         } catch (error) {
             if (error instanceof Response) {
                 return thunkAPI.rejectWithValue({ error: error.status + " " + error.statusText });
+            } else if (error instanceof Error) {
+                return thunkAPI.rejectWithValue({ error: error.message });
             }
             return thunkAPI.rejectWithValue({ error: "An error has occured" });
         }
+    }, {
+    condition: () => {
+        if (!localStorage.getItem("user")) return false;
     }
+}
 )
 
 export const accountSlice = createSlice({
@@ -52,9 +62,19 @@ export const accountSlice = createSlice({
             state.user = null;
             localStorage.removeItem("user");
             router.navigate("/");
+        },
+        setUser: (state, action) => {
+            state.user = action.payload
         }
     },
     extraReducers: (builder => {
+        builder.addCase(fetchCurrUser.rejected, (state) => {
+            state.user = null;
+            localStorage.removeItem("user");
+            toast.error("Session expired or invalid token, please login again");
+            router.navigate("/login");
+        });
+
         builder.addMatcher(isAnyOf(loginUser.fulfilled, fetchCurrUser.fulfilled), (state, action) => {
             state.user = action.payload;
         });
@@ -65,4 +85,4 @@ export const accountSlice = createSlice({
     })
 })
 
-export const { logOut } = accountSlice.actions;
+export const { logOut, setUser } = accountSlice.actions;

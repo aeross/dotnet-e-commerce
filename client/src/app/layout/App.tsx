@@ -9,6 +9,7 @@ import agent from '../api/agent';
 import Loading from './Loading';
 import { setCart } from '../../features/cart/cartSlice';
 import { useAppDispatch } from '../store/configureStore';
+import { fetchCurrUser } from '../../features/account/accountSlice';
 
 function App() {
   const [dark, setDark] = useState(false);
@@ -18,6 +19,7 @@ function App() {
 
   useEffect(() => {
     const buyerId = getCookie("buyerId");
+    dispatch(fetchCurrUser());
 
     if (buyerId) {
       (async () => {

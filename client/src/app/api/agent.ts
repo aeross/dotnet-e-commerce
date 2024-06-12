@@ -2,12 +2,21 @@ import { toast } from "react-toastify";
 import { ErrorResponse } from "../models/response";
 import { router } from "../router/Routes";
 import { PaginatedResponse } from "../models/pagination";
+import { store } from "../store/configureStore";
 
 const baseURL = "http://localhost:5000/" + "api/";
 
 // add a fake delay to our app
 const sleep = () => new Promise(resolve => setTimeout(resolve, 250));
 
+// add authorization token (if exists)
+const includeTokenIfExists = () => {
+    const token = store.getState().account.user?.token;
+    if (token) return `Bearer ${token}`;
+    return "";
+}
+
+// handle API response
 const getResponseJson = async (response: Response) => {
     const contentType = response.headers.get('content-type');
     if (!contentType || contentType.indexOf('application/json') === -1) {
@@ -29,7 +38,10 @@ const getResponseJson = async (response: Response) => {
 async function getData(url: string) {
     try {
         // fetch URL
-        let res = await fetch(url, { credentials: "include" });
+        let res = await fetch(url, {
+            credentials: "include",
+            headers: { "Authorization": includeTokenIfExists() },
+        });
 
         // have to manually throw error if response if not OK...
         // that's just how fetch API works
@@ -46,7 +58,7 @@ async function postData(url: string, data: object) {
     try {
         const res = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "Authorization": includeTokenIfExists() },
             body: JSON.stringify(data),
             credentials: "include"  // for cookies
         });
@@ -63,7 +75,7 @@ async function putData(url: string, data: object) {
     try {
         const res = await fetch(url, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "Authorization": includeTokenIfExists() },
             body: JSON.stringify(data),
             credentials: "include"
         });
@@ -80,7 +92,8 @@ async function deleteData(url: string) {
     try {
         const res = await fetch(url, {
             method: "DELETE",
-            credentials: "include"
+            credentials: "include",
+            headers: { "Authorization": includeTokenIfExists() },
         });
         if (!res.ok) throw res;
 

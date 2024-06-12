@@ -22,6 +22,8 @@ export const addCartItemAsync = createAsyncThunk<Cart, { productId: number, qty?
         } catch (error: unknown) {
             if (error instanceof Response) {
                 return thunkAPI.rejectWithValue({ error: error.status + " " + error.statusText });
+            } else if (error instanceof Error) {
+                return thunkAPI.rejectWithValue({ error: error.message });
             }
             return thunkAPI.rejectWithValue({ error: "An error has occured" });
         }
@@ -36,6 +38,8 @@ export const removeCartItemAsync = createAsyncThunk<void, { productId: number, q
         } catch (error: unknown) {
             if (error instanceof Response) {
                 return thunkAPI.rejectWithValue({ error: error.status + " " + error.statusText });
+            } else if (error instanceof Error) {
+                return thunkAPI.rejectWithValue({ error: error.message });
             }
             return thunkAPI.rejectWithValue({ error: "An error has occured" });
         }
