@@ -1,6 +1,7 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, isAnyOf } from "@reduxjs/toolkit";
 import { Cart } from "../../app/models/cart";
 import agent from "../../app/api/agent";
+import { getCookie } from "../../app/utils/cookie";
 
 export interface cartState {
     cart: Cart | null;
@@ -14,6 +15,26 @@ const initialState: cartState = {
 
 
 // centralising our API requests here
+export const fetchCartAsync = createAsyncThunk<Cart>(
+    "cart/fetchCartAsync",
+    async (_, thunkAPI) => {
+        try {
+            return await agent.Cart.get();
+        } catch (error) {
+            if (error instanceof Response) {
+                return thunkAPI.rejectWithValue({ error: error.status + " " + error.statusText });
+            } else if (error instanceof Error) {
+                return thunkAPI.rejectWithValue({ error: error.message });
+            }
+            return thunkAPI.rejectWithValue({ error: "An error has occured" });
+        }
+    }, {
+    condition: () => {
+        if (!getCookie("buyerId")) return false;
+    }
+}
+)
+
 export const addCartItemAsync = createAsyncThunk<Cart, { productId: number, qty?: number }>(
     "cart/addItemAsync",
     async ({ productId, qty = 1 }, thunkAPI) => {
@@ -56,23 +77,6 @@ export const cartSlice = createSlice({
         }
     },
     extraReducers: (builder) => {
-        // when fetching is on progress...
-        builder.addCase(addCartItemAsync.pending, (state, action) => {
-            state.status = "pendingAdd" + action.meta.arg.productId + "Item";
-        });
-
-        // when the request returns ok
-        builder.addCase(addCartItemAsync.fulfilled, (state, action) => {
-            if (action.payload) state.cart = action.payload;
-            state.status = "idle";
-        });
-
-        // when the request returns an error
-        builder.addCase(addCartItemAsync.rejected, (state, action) => {
-            console.log(action.payload);
-            state.status = "idle";
-        });
-
         builder.addCase(removeCartItemAsync.pending, (state, action) => {
             const name = action.meta.arg.name ?? "";
             state.status = "pendingRemove" + action.meta.arg.productId + name + "Item";
@@ -96,6 +100,24 @@ export const cartSlice = createSlice({
             state.status = "idle";
         });
         builder.addCase(removeCartItemAsync.rejected, (state, action) => {
+            console.log(action.payload);
+            state.status = "idle";
+        });
+
+
+        // when fetching is on progress...
+        builder.addCase(addCartItemAsync.pending, (state, action) => {
+            state.status = "pendingAdd" + action.meta.arg.productId + "Item";
+        });
+
+        // when the request returns ok
+        builder.addMatcher(isAnyOf(fetchCartAsync.fulfilled, addCartItemAsync.fulfilled), (state, action) => {
+            if (action.payload) state.cart = action.payload;
+            state.status = "idle";
+        });
+
+        // when the request returns an error
+        builder.addMatcher(isAnyOf(fetchCartAsync.rejected, addCartItemAsync.rejected), (state, action) => {
             console.log(action.payload);
             state.status = "idle";
         });

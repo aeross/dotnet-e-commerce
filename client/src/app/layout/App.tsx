@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Header from './Header';
 import { Container, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/ReactToastify.css";
-import { getCookie } from '../utils/cookie';
-import agent from '../api/agent';
 import Loading from './Loading';
-import { setCart } from '../../features/cart/cartSlice';
+import { fetchCartAsync } from '../../features/cart/cartSlice';
 import { useAppDispatch } from '../store/configureStore';
 import { fetchCurrUser } from '../../features/account/accountSlice';
 
@@ -17,25 +15,22 @@ function App() {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const buyerId = getCookie("buyerId");
-    dispatch(fetchCurrUser());
+  const initApp = useCallback(async () => {
+    await dispatch(fetchCurrUser());
+    await dispatch(fetchCartAsync());
+  }, [dispatch]);
 
-    if (buyerId) {
-      (async () => {
-        try {
-          const cart = await agent.Cart.get();
-          dispatch(setCart(cart));
-        } catch (error) {
-          console.log(error);
-        } finally {
-          setLoading(false);
-        }
-      })();
-    } else {
-      setLoading(false);
-    }
-  }, [dispatch])
+  useEffect(() => {
+    (async () => {
+      try {
+        await initApp();
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [initApp])
 
   const theme = createTheme({
     palette: {
