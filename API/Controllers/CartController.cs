@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,17 +23,17 @@ namespace API.Controllers
         [HttpGet(Name = "GetCart")]
         public async Task<ActionResult<CartDto>> GetCart()
         {
-            Cart cart = await _RetrieveCart();
+            Cart cart = await _RetrieveCart(_GetBuyerId());
 
             if (cart == null) return NotFound();
 
-            return _MapCartToDto(cart);
+            return cart.MapCartToDto();
         }
 
         [HttpPost]
         public async Task<ActionResult<CartDto>> AddToCart(int productId, int qty)
         {
-            Cart cart = await _RetrieveCart();
+            Cart cart = await _RetrieveCart(_GetBuyerId());
             if (cart == null) cart = _CreateCart();
 
             Product product = await _RetrieveProduct(productId);
@@ -42,14 +43,14 @@ namespace API.Controllers
 
             // save changes to database
             int result = await _context.SaveChangesAsync();
-            if (result > 0) return CreatedAtRoute("GetCart", _MapCartToDto(cart));
+            if (result > 0) return CreatedAtRoute("GetCart", cart.MapCartToDto());
             return BadRequest(new ProblemDetails { Title = "Problem saving item to basket" });
         }
 
         [HttpDelete]
         public async Task<ActionResult> DeleteFromCart(int productId, int qty)
         {
-            Cart cart = await _RetrieveCart();
+            Cart cart = await _RetrieveCart(_GetBuyerId());
             if (cart == null) return NotFound();
 
             cart.RemoveItem(productId, qty);
@@ -66,18 +67,31 @@ namespace API.Controllers
             return await _context.Products.FirstOrDefaultAsync(x => x.Id == productId);
         }
 
-        private async Task<Cart> _RetrieveCart()
+        private async Task<Cart> _RetrieveCart(string buyerId)  // the username of the user, or the cookie value if user isn't logged in
         {
+            if (string.IsNullOrEmpty(buyerId))
+            {
+                Response.Cookies.Delete("buyerId");
+                return null;
+            }
+
             return await _context.Carts
                 .Include(i => i.Items)
                 .ThenInclude(p => p.Product)
-                .FirstOrDefaultAsync(x => x.BuyerId == Request.Cookies["buyerId"]);
+                .FirstOrDefaultAsync(x => x.BuyerId == buyerId);
+        }
+
+        private string _GetBuyerId()
+        {
+            return User.Identity?.Name ?? Request.Cookies["buyerId"];
         }
 
         private Cart _CreateCart()
         {
-            // randomly generate a new buyerId, as we haven't implemented the users table and the login system yet
-            string buyerId = Guid.NewGuid().ToString();
+            // get the buyerId, or randomly generate one if user isn't logged in
+            var buyerId = User.Identity?.Name;
+            if (string.IsNullOrEmpty(buyerId))
+                buyerId = Guid.NewGuid().ToString();
 
             // insert buyerId into the client's cookies
             CookieOptions cookieOptions = new CookieOptions { IsEssential = true, Expires = DateTime.Now.AddDays(30) };
@@ -87,25 +101,6 @@ namespace API.Controllers
             Cart newCart = new Cart { BuyerId = buyerId };
             _context.Carts.Add(newCart);
             return newCart;
-        }
-
-        private static CartDto _MapCartToDto(Cart cart)
-        {
-            return new CartDto
-            {
-                Id = cart.Id,
-                BuyerId = cart.BuyerId,
-                Items = cart.Items.Select(item => new CartItemDto
-                {
-                    ProductId = item.ProductId,
-                    Name = item.Product.Name,
-                    Price = item.Product.Price,
-                    PictureUrl = item.Product.PictureUrl,
-                    Type = item.Product.Type,
-                    Brand = item.Product.Brand,
-                    Quantity = item.Qty
-                }).ToList()
-            };
         }
     }
 }

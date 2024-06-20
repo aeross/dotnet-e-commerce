@@ -4,6 +4,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useAppDispatch, useAppSelector } from '../store/configureStore';
 import { logOut } from '../../features/account/accountSlice';
+import { clearCart } from '../../features/cart/cartSlice';
 
 export default function SignedInMenu() {
     const dispatch = useAppDispatch();
@@ -30,7 +31,7 @@ export default function SignedInMenu() {
             >
                 <MenuItem onClick={handleClose}>Profile</MenuItem>
                 <MenuItem onClick={handleClose}>My orders</MenuItem>
-                <MenuItem onClick={() => dispatch(logOut())}>Logout</MenuItem>
+                <MenuItem onClick={() => { dispatch(logOut()), dispatch(clearCart()) }}>Logout</MenuItem>
             </Menu>
         </>
     );
