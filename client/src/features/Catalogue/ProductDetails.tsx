@@ -87,10 +87,6 @@ function ProductDetails() {
                                     <TableCell>Brand</TableCell>
                                     <TableCell>{product.brand}</TableCell>
                                 </TableRow>
-                                <TableRow>
-                                    <TableCell>Quantity In Stock</TableCell>
-                                    <TableCell>{product.quantityInStock}</TableCell>
-                                </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>

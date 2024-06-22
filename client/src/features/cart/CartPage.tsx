@@ -11,6 +11,7 @@ function CartPage() {
     const dispatch = useAppDispatch();
     const { cart, status } = useAppSelector(state => state.cart);
 
+
     if (!cart || cart.items.length === 0) return <Typography variant="h3">Your cart is empty</Typography>
 
     return (

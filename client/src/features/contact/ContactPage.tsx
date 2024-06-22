@@ -1,24 +1,15 @@
-import { Button, ButtonGroup, Typography } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
-import { decrement, increment } from './counterSlice';
+import { Container, Typography } from '@mui/material';
 
 function ContactPage() {
-    const dispatch = useAppDispatch();
-    const { data, title } = useAppSelector(state => state.counter);
 
     return (
-        <>
-            <Typography variant="h2">{title}</Typography>
-            <Typography variant="h4">
-                Count: {data}
+        <Container>
+            <Typography gutterBottom variant="h3">Lorem Ipsum</Typography>
+
+            <Typography variant="body1">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo tempore fuga eius inventore eum porro sint numquam illum, totam id corporis dicta sapiente sed fugit odio labore corrupti iure dolore. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Possimus quia aperiam similique minus culpa beatae accusamus. Aliquid perspiciatis error, atque animi expedita architecto pariatur suscipit magnam nisi obcaecati nam odio.
             </Typography>
-            <ButtonGroup>
-                <Button onClick={() => dispatch(decrement(1))}>{"-"}</Button>
-                <Button onClick={() => dispatch(increment(1))}>{"+"}</Button>
-                <Button onClick={() => dispatch(decrement(5))}>{"-5"}</Button>
-                <Button onClick={() => dispatch(increment(5))}>{"+5"}</Button>
-            </ButtonGroup>
-        </>
+        </Container>
     )
 }
 

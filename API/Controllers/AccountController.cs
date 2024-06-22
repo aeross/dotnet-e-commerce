@@ -37,7 +37,8 @@ namespace API.Controllers
             var userCart = await _RetrieveCart(loginDto.Username);
             var anonCart = await _RetrieveCart(Request.Cookies["buyerId"]);
 
-            if (anonCart != null)
+
+            if (anonCart != null && anonCart.Items.Count > 0)
             {
                 if (userCart != null)
                 {
@@ -45,7 +46,6 @@ namespace API.Controllers
                 }
                 anonCart.BuyerId = user.UserName;
                 Response.Cookies.Delete("buyerId");
-                // _context.Carts.Add(anonCart);
                 await _context.SaveChangesAsync();
             }
 
@@ -53,7 +53,7 @@ namespace API.Controllers
             {
                 Email = user.Email,
                 Token = await _tokenService.GenerateToken(user),
-                Cart = anonCart == null ? userCart?.MapCartToDto() : anonCart.MapCartToDto()
+                Cart = (anonCart != null && anonCart.Items.Count > 0) ? anonCart.MapCartToDto() : userCart?.MapCartToDto()
             };
         }
 

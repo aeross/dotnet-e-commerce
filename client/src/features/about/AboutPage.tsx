@@ -1,43 +1,13 @@
-import { Alert, AlertTitle, Button, ButtonGroup, Container, List, ListItem, ListItemText, Typography } from '@mui/material'
-import agent from '../../app/api/agent'
-import { useState } from 'react'
+import { Container, Typography } from '@mui/material'
 
 function AboutPage() {
-    const [validationErrors, setValidationErrors] = useState<string[]>([]);
-
-    async function handleValidationError() {
-        try {
-            await agent.TestErrors.getValidationError();
-            console.log("should not see this");
-        } catch (error: any) {
-            setValidationErrors(error);
-        }
-
-    }
-
     return (
         <Container>
-            <Typography gutterBottom variant="h2">Errors for testing purposes</Typography>
-            <ButtonGroup fullWidth>
-                <Button variant="contained" onClick={agent.TestErrors.get400}>Bad Request Error</Button>
-                <Button variant="contained" onClick={agent.TestErrors.get401}>Unauthorized Error</Button>
-                <Button variant="contained" onClick={agent.TestErrors.get404}>Not Found Error</Button>
-                <Button variant="contained" onClick={agent.TestErrors.get500}>Internal Server Error</Button>
-                <Button variant="contained" onClick={handleValidationError}>Validation Error</Button>
-            </ButtonGroup>
+            <Typography gutterBottom variant="h3">Lorem Ipsum</Typography>
 
-            {validationErrors.length > 0 && (
-                <Alert severity="error">
-                    <AlertTitle>Validation Errors</AlertTitle>
-                    <List>
-                        {validationErrors.map((e, i) => (
-                            <ListItem key={i}>
-                                <ListItemText>{e}</ListItemText>
-                            </ListItem>
-                        ))}
-                    </List>
-                </Alert>
-            )}
+            <Typography variant="body1">
+                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ullam impedit inventore, minus facilis, aliquid nulla dignissimos necessitatibus eaque voluptatem enim veritatis porro repellat odit sit! Nisi, quo sit. Aperiam, quam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Repellat eaque deserunt quas magni laudantium nam accusamus dolore placeat. Aliquid hic consectetur explicabo ipsa magnam soluta aperiam, doloribus perspiciatis rerum nam!
+            </Typography>
         </Container>
     )
 }

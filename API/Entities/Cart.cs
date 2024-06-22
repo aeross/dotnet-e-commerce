@@ -34,5 +34,12 @@ namespace API.Entities
             item.Qty -= qty;
             if (item.Qty <= 0) Items.Remove(item);
         }
+
+
+        public override string ToString()
+        {
+            return "{ Id: " + this.Id + ", BuyerId: " + this.BuyerId + ", + Items: " +
+            this.Items.Count + "}";
+        }
     }
 }
